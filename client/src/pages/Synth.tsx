@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { SynthEngine } from "@/lib/synth";
@@ -34,7 +34,7 @@ const defaultSettings: SynthSettings = {
     },
     reverb: {
       roomSize: 0.5,
-      dampening: 3000,
+      dampening: 3000, // Minimum value should be above 0
     },
   },
 };
@@ -53,21 +53,31 @@ export default function Synth() {
   useEffect(() => {
     if (!synth) return;
 
-    synth.setOscillatorType(settings.oscillator.type);
-    synth.setDetune(settings.oscillator.detune);
-    synth.setFilter(
-      settings.filter.frequency,
-      settings.filter.resonance,
-      settings.filter.type
-    );
-    synth.setEnvelope(
-      settings.envelope.attack,
-      settings.envelope.decay,
-      settings.envelope.sustain,
-      settings.envelope.release
-    );
-    synth.setDelay(settings.effects.delay.time, settings.effects.delay.feedback);
-    synth.setReverb(settings.effects.reverb.roomSize, settings.effects.reverb.dampening);
+    try {
+      synth.setOscillatorType(settings.oscillator.type);
+      synth.setDetune(settings.oscillator.detune);
+      synth.setFilter(
+        Math.max(20, settings.filter.frequency), // Ensure minimum frequency
+        Math.max(0.001, settings.filter.resonance), // Ensure minimum resonance
+        settings.filter.type
+      );
+      synth.setEnvelope(
+        Math.max(0.001, settings.envelope.attack),
+        Math.max(0.001, settings.envelope.decay),
+        Math.max(0.001, settings.envelope.sustain),
+        Math.max(0.001, settings.envelope.release)
+      );
+      synth.setDelay(
+        Math.max(0.001, settings.effects.delay.time),
+        Math.max(0.001, settings.effects.delay.feedback)
+      );
+      synth.setReverb(
+        Math.max(0.001, settings.effects.reverb.roomSize),
+        Math.max(20, settings.effects.reverb.dampening) // Ensure minimum dampening
+      );
+    } catch (error) {
+      console.error('Error updating synth settings:', error);
+    }
   }, [settings, synth]);
 
   const handleStart = async () => {

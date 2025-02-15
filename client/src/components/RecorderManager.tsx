@@ -59,7 +59,7 @@ export function RecorderManager({ synth }: RecorderManagerProps) {
     const url = URL.createObjectURL(recordedBlob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `synth-recording-${new Date().toISOString()}.wav`;
+    a.download = `synth-recording-${new Date().toISOString()}.webm`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

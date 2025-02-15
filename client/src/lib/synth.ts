@@ -5,7 +5,8 @@ export class SynthEngine {
   filter: Tone.Filter;
   delay: Tone.FeedbackDelay;
   reverb: Tone.Reverb;
-  recorder: Tone.Recorder;
+  recorder: MediaRecorder | null = null;
+  chunks: BlobPart[] = [];
 
   constructor() {
     // Initialize audio nodes
@@ -13,15 +14,12 @@ export class SynthEngine {
     this.filter = new Tone.Filter();
     this.delay = new Tone.FeedbackDelay();
     this.reverb = new Tone.Reverb();
-    this.recorder = new Tone.Recorder();
 
     // Connect the audio chain
     this.synth.connect(this.filter);
     this.filter.connect(this.delay);
     this.delay.connect(this.reverb);
     this.reverb.connect(Tone.Destination);
-    // Connect the final output to the recorder in parallel
-    this.reverb.connect(this.recorder);
   }
 
   setOscillatorType(type: "sine" | "square" | "sawtooth" | "triangle") {
@@ -86,17 +84,46 @@ export class SynthEngine {
     }
   }
 
-  // Recording methods
+  // Recording methods using MediaRecorder
   async startRecording() {
-    await this.recorder.start();
+    if (this.recorder) return;
+
+    const dest = Tone.context.createMediaStreamDestination();
+    this.reverb.connect(dest);
+
+    this.chunks = [];
+    this.recorder = new MediaRecorder(dest.stream, {
+      mimeType: 'audio/webm'
+    });
+
+    this.recorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        this.chunks.push(event.data);
+      }
+    };
+
+    this.recorder.start();
   }
 
   async stopRecording(): Promise<Blob> {
-    const recording = await this.recorder.stop();
-    return new Blob([recording], { type: 'audio/wav' });
+    return new Promise((resolve, reject) => {
+      if (!this.recorder) {
+        reject(new Error('No recording in progress'));
+        return;
+      }
+
+      this.recorder.onstop = () => {
+        const blob = new Blob(this.chunks, { type: 'audio/webm' });
+        this.chunks = [];
+        this.recorder = null;
+        resolve(blob);
+      };
+
+      this.recorder.stop();
+    });
   }
 
   isRecording(): boolean {
-    return this.recorder.state === "started";
+    return this.recorder !== null && this.recorder.state === "recording";
   }
 }

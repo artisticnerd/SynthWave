@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -29,10 +29,18 @@ export default function Tutorial() {
   const [synth, setSynth] = useState<SynthEngine>();
   const [isStarted, setIsStarted] = useState(false);
 
-  const handleStart = async () => {
-    const synthEngine = new SynthEngine();
-    await synthEngine.start();
-    setSynth(synthEngine);
+  useEffect(() => {
+    if (isStarted && !synth) {
+      const initSynth = async () => {
+        const synthEngine = new SynthEngine();
+        await synthEngine.start();
+        setSynth(synthEngine);
+      };
+      initSynth();
+    }
+  }, [isStarted, synth]);
+
+  const handleStart = () => {
     setIsStarted(true);
   };
 
@@ -49,6 +57,8 @@ export default function Tutorial() {
   };
 
   const currentProgress = ((currentStep + 1) / steps.length) * 100;
+
+  const StepComponent = steps[currentStep].component;
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -83,10 +93,10 @@ export default function Tutorial() {
                 <CardDescription>{steps[currentStep].description}</CardDescription>
               </CardHeader>
               <CardContent>
-                {steps[currentStep].component({
-                  synth,
-                  onComplete: handleNext
-                })}
+                <StepComponent
+                  synth={synth}
+                  onComplete={handleNext}
+                />
               </CardContent>
             </Card>
 

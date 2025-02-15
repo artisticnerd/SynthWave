@@ -9,6 +9,7 @@ import { EffectsSection } from "@/components/EffectsSection";
 import { Keyboard } from "@/components/Keyboard";
 import { type SynthSettings } from "@shared/schema";
 import { PresetManager } from "@/components/PresetManager";
+import { Music } from "lucide-react";
 
 const defaultSettings: SynthSettings = {
   oscillator: {
@@ -40,19 +41,14 @@ const defaultSettings: SynthSettings = {
 
 export default function Synth() {
   const [synth, setSynth] = useState<SynthEngine>();
+  const [isStarted, setIsStarted] = useState(false);
   const [settings, setSettings] = useState<SynthSettings>(defaultSettings);
   const { toast } = useToast();
 
   useEffect(() => {
     const synthEngine = new SynthEngine();
-    synthEngine.start().then(() => {
-      setSynth(synthEngine);
-      toast({
-        title: "Synth Ready",
-        description: "Click or use your keyboard to play notes!",
-      });
-    });
-  }, [toast]);
+    setSynth(synthEngine);
+  }, []);
 
   useEffect(() => {
     if (!synth) return;
@@ -74,9 +70,41 @@ export default function Synth() {
     synth.setReverb(settings.effects.reverb.roomSize, settings.effects.reverb.dampening);
   }, [settings, synth]);
 
+  const handleStart = async () => {
+    if (!synth) return;
+
+    try {
+      await synth.start();
+      setIsStarted(true);
+      toast({
+        title: "Synth Ready",
+        description: "Click or use your keyboard to play notes!",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to start audio context. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background p-8">
       <h1 className="text-4xl font-bold text-center mb-8">Web Synth</h1>
+
+      {!isStarted && (
+        <div className="flex justify-center mb-8">
+          <Button
+            size="lg"
+            onClick={handleStart}
+            className="gap-2"
+          >
+            <Music className="w-5 h-5" />
+            Start Synth
+          </Button>
+        </div>
+      )}
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 gap-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -53,8 +53,8 @@ export class SynthEngine {
 
   setReverb(roomSize: number, dampening: number) {
     this.reverb.set({
-      roomSize,
-      dampening,
+      decay: roomSize * 10, // Convert 0-1 range to 0-10 seconds
+      damping: dampening,
     });
   }
 
@@ -68,7 +68,13 @@ export class SynthEngine {
     this.synth.triggerRelease(freq);
   }
 
+  isStarted(): boolean {
+    return Tone.context.state === "running";
+  }
+
   async start() {
-    await Tone.start();
+    if (Tone.context.state !== "running") {
+      await Tone.start();
+    }
   }
 }

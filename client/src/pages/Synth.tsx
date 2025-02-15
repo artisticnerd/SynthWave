@@ -8,6 +8,7 @@ import { EnvelopeSection } from "@/components/EnvelopeSection";
 import { EffectsSection } from "@/components/EffectsSection";
 import { Keyboard } from "@/components/Keyboard";
 import { type SynthSettings } from "@shared/schema";
+import { PresetManager } from "@/components/PresetManager";
 
 const defaultSettings: SynthSettings = {
   oscillator: {
@@ -76,90 +77,97 @@ export default function Synth() {
   return (
     <div className="min-h-screen bg-background p-8">
       <h1 className="text-4xl font-bold text-center mb-8">Web Synth</h1>
-      
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-        <OscillatorSection
-          type={settings.oscillator.type}
-          detune={settings.oscillator.detune}
-          onTypeChange={(type) =>
-            setSettings((s) => ({ ...s, oscillator: { ...s.oscillator, type } }))
-          }
-          onDetuneChange={(detune) =>
-            setSettings((s) => ({ ...s, oscillator: { ...s.oscillator, detune } }))
-          }
-        />
-        
-        <FilterSection
-          frequency={settings.filter.frequency}
-          resonance={settings.filter.resonance}
-          type={settings.filter.type}
-          onFrequencyChange={(frequency) =>
-            setSettings((s) => ({ ...s, filter: { ...s.filter, frequency } }))
-          }
-          onResonanceChange={(resonance) =>
-            setSettings((s) => ({ ...s, filter: { ...s.filter, resonance } }))
-          }
-          onTypeChange={(type) =>
-            setSettings((s) => ({ ...s, filter: { ...s.filter, type } }))
-          }
-        />
-        
-        <EnvelopeSection
-          attack={settings.envelope.attack}
-          decay={settings.envelope.decay}
-          sustain={settings.envelope.sustain}
-          release={settings.envelope.release}
-          onAttackChange={(attack) =>
-            setSettings((s) => ({ ...s, envelope: { ...s.envelope, attack } }))
-          }
-          onDecayChange={(decay) =>
-            setSettings((s) => ({ ...s, envelope: { ...s.envelope, decay } }))
-          }
-          onSustainChange={(sustain) =>
-            setSettings((s) => ({ ...s, envelope: { ...s.envelope, sustain } }))
-          }
-          onReleaseChange={(release) =>
-            setSettings((s) => ({ ...s, envelope: { ...s.envelope, release } }))
-          }
-        />
-        
-        <EffectsSection
-          delayTime={settings.effects.delay.time}
-          delayFeedback={settings.effects.delay.feedback}
-          reverbSize={settings.effects.reverb.roomSize}
-          reverbDamp={settings.effects.reverb.dampening}
-          onDelayTimeChange={(time) =>
-            setSettings((s) => ({
-              ...s,
-              effects: { ...s.effects, delay: { ...s.effects.delay, time } },
-            }))
-          }
-          onDelayFeedbackChange={(feedback) =>
-            setSettings((s) => ({
-              ...s,
-              effects: { ...s.effects, delay: { ...s.effects.delay, feedback } },
-            }))
-          }
-          onReverbSizeChange={(roomSize) =>
-            setSettings((s) => ({
-              ...s,
-              effects: { ...s.effects, reverb: { ...s.effects.reverb, roomSize } },
-            }))
-          }
-          onReverbDampChange={(dampening) =>
-            setSettings((s) => ({
-              ...s,
-              effects: { ...s.effects, reverb: { ...s.effects.reverb, dampening } },
-            }))
-          }
-        />
-      </div>
 
-      <div className="mt-8 flex justify-center">
-        <Keyboard
-          noteOn={(note) => synth?.noteOn(note)}
-          noteOff={(note) => synth?.noteOff(note)}
+      <div className="max-w-6xl mx-auto grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <OscillatorSection
+            type={settings.oscillator.type}
+            detune={settings.oscillator.detune}
+            onTypeChange={(type) =>
+              setSettings((s) => ({ ...s, oscillator: { ...s.oscillator, type } }))
+            }
+            onDetuneChange={(detune) =>
+              setSettings((s) => ({ ...s, oscillator: { ...s.oscillator, detune } }))
+            }
+          />
+
+          <FilterSection
+            frequency={settings.filter.frequency}
+            resonance={settings.filter.resonance}
+            type={settings.filter.type}
+            onFrequencyChange={(frequency) =>
+              setSettings((s) => ({ ...s, filter: { ...s.filter, frequency } }))
+            }
+            onResonanceChange={(resonance) =>
+              setSettings((s) => ({ ...s, filter: { ...s.filter, resonance } }))
+            }
+            onTypeChange={(type) =>
+              setSettings((s) => ({ ...s, filter: { ...s.filter, type } }))
+            }
+          />
+
+          <EnvelopeSection
+            attack={settings.envelope.attack}
+            decay={settings.envelope.decay}
+            sustain={settings.envelope.sustain}
+            release={settings.envelope.release}
+            onAttackChange={(attack) =>
+              setSettings((s) => ({ ...s, envelope: { ...s.envelope, attack } }))
+            }
+            onDecayChange={(decay) =>
+              setSettings((s) => ({ ...s, envelope: { ...s.envelope, decay } }))
+            }
+            onSustainChange={(sustain) =>
+              setSettings((s) => ({ ...s, envelope: { ...s.envelope, sustain } }))
+            }
+            onReleaseChange={(release) =>
+              setSettings((s) => ({ ...s, envelope: { ...s.envelope, release } }))
+            }
+          />
+
+          <EffectsSection
+            delayTime={settings.effects.delay.time}
+            delayFeedback={settings.effects.delay.feedback}
+            reverbSize={settings.effects.reverb.roomSize}
+            reverbDamp={settings.effects.reverb.dampening}
+            onDelayTimeChange={(time) =>
+              setSettings((s) => ({
+                ...s,
+                effects: { ...s.effects, delay: { ...s.effects.delay, time } },
+              }))
+            }
+            onDelayFeedbackChange={(feedback) =>
+              setSettings((s) => ({
+                ...s,
+                effects: { ...s.effects, delay: { ...s.effects.delay, feedback } },
+              }))
+            }
+            onReverbSizeChange={(roomSize) =>
+              setSettings((s) => ({
+                ...s,
+                effects: { ...s.effects, reverb: { ...s.effects.reverb, roomSize } },
+              }))
+            }
+            onReverbDampChange={(dampening) =>
+              setSettings((s) => ({
+                ...s,
+                effects: { ...s.effects, reverb: { ...s.effects.reverb, dampening } },
+              }))
+            }
+          />
+        </div>
+
+        <PresetManager
+          currentSettings={settings}
+          onLoadPreset={setSettings}
         />
+
+        <div className="mt-8 flex justify-center">
+          <Keyboard
+            noteOn={(note) => synth?.noteOn(note)}
+            noteOff={(note) => synth?.noteOff(note)}
+          />
+        </div>
       </div>
     </div>
   );

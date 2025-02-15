@@ -1,4 +1,6 @@
 import { synthPresets, type Preset, type InsertPreset } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   getAllPresets(): Promise<Preset[]>;
@@ -7,33 +9,27 @@ export interface IStorage {
   deletePreset(id: number): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private presets: Map<number, Preset>;
-  private currentId: number;
-
-  constructor() {
-    this.presets = new Map();
-    this.currentId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
   async getAllPresets(): Promise<Preset[]> {
-    return Array.from(this.presets.values());
+    return await db.select().from(synthPresets);
   }
 
   async getPreset(id: number): Promise<Preset | undefined> {
-    return this.presets.get(id);
+    const [preset] = await db.select().from(synthPresets).where(eq(synthPresets.id, id));
+    return preset;
   }
 
   async createPreset(insertPreset: InsertPreset): Promise<Preset> {
-    const id = this.currentId++;
-    const preset: Preset = { ...insertPreset, id };
-    this.presets.set(id, preset);
+    const [preset] = await db
+      .insert(synthPresets)
+      .values(insertPreset)
+      .returning();
     return preset;
   }
 
   async deletePreset(id: number): Promise<void> {
-    this.presets.delete(id);
+    await db.delete(synthPresets).where(eq(synthPresets.id, id));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

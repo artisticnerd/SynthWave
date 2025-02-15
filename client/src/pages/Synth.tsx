@@ -10,6 +10,7 @@ import { Keyboard } from "@/components/Keyboard";
 import { type SynthSettings } from "@shared/schema";
 import { PresetManager } from "@/components/PresetManager";
 import { Music } from "lucide-react";
+import { RecorderManager } from "@/components/RecorderManager";
 
 const defaultSettings: SynthSettings = {
   oscillator: {
@@ -103,7 +104,7 @@ export default function Synth() {
     <div className="min-h-screen bg-background p-8">
       <h1 className="text-4xl font-bold text-center mb-8">Web Synth</h1>
 
-      {!isStarted && (
+      {!isStarted ? (
         <div className="flex justify-center mb-8">
           <Button
             size="lg"
@@ -113,6 +114,10 @@ export default function Synth() {
             <Music className="w-5 h-5" />
             Start Synth
           </Button>
+        </div>
+      ) : (
+        <div className="flex justify-center mb-8">
+          <RecorderManager synth={synth} />
         </div>
       )}
 

@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { SynthEngine } from "@/lib/synth";
@@ -18,10 +24,12 @@ interface TutorialStep {
 const steps: TutorialStep[] = [
   {
     title: "Understanding Waveforms",
-    description: "Learn about the basic building blocks of synthesis: sine, square, sawtooth, and triangle waves.",
+    description:
+      "Learn about the basic building blocks of synthesis: sine, square, sawtooth, and triangle waves.",
     component: WaveformExplorer,
   },
   // More steps will be added as we implement them
+  // Video tutorials will be added as we implement them
 ];
 
 export default function Tutorial() {
@@ -46,13 +54,13 @@ export default function Tutorial() {
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
-      setCurrentStep(curr => curr + 1);
+      setCurrentStep((curr) => curr + 1);
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 0) {
-      setCurrentStep(curr => curr - 1);
+      setCurrentStep((curr) => curr - 1);
     }
   };
 
@@ -70,8 +78,9 @@ export default function Tutorial() {
             <CardHeader>
               <CardTitle>Welcome to Sound Design</CardTitle>
               <CardDescription>
-                Learn the basics of synthesis through interactive examples and challenges.
-                We'll guide you through understanding waveforms, filters, envelopes, and effects.
+                Learn the basics of synthesis through interactive examples and
+                challenges. We'll guide you through understanding waveforms,
+                filters, envelopes, and effects.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -90,13 +99,12 @@ export default function Tutorial() {
             <Card>
               <CardHeader>
                 <CardTitle>{steps[currentStep].title}</CardTitle>
-                <CardDescription>{steps[currentStep].description}</CardDescription>
+                <CardDescription>
+                  {steps[currentStep].description}
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <StepComponent
-                  synth={synth}
-                  onComplete={handleNext}
-                />
+                <StepComponent synth={synth} onComplete={handleNext} />
               </CardContent>
             </Card>
 
